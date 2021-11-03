@@ -1,7 +1,9 @@
 (defpackage #:pairing-heap
   (:use #:common-lisp)
-  (:export #:make-heap
-           #:find-min
+  (:export #:create
            #:insert
-           #:delete-min
-           #:emptyp))
+           #:front
+           #:pop-front
+           #:emptyp
+           #:empty-heap-error
+           #:empty-heap-error-heap))

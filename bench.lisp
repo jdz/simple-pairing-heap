@@ -32,9 +32,9 @@
                       (time
                        (loop repeat repeat do (run)))))))
       (bench (heap item "PAIRING-HEAP")
-             (pairing-heap:make-heap :key key)
+             (pairing-heap:create :key key)
              (pairing-heap:insert item heap)
-             (pairing-heap:delete-min heap))
+             (pairing-heap:pop-front heap))
       (bench (heap item "BODGE-HEAP")
              (bodge-heap:make-pairing-heap :key key)
              (bodge-heap:pairing-heap-push heap item)

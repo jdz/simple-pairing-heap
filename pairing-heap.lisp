@@ -60,6 +60,34 @@
     (walk-children (tree-subheaps tree) nil)
     tree))
 
+(defun meld-trees (one two key test)
+  (declare (type pairing-tree one two)
+           (type function key test)
+           (optimize (speed 3) (safety 1)))
+  (let ((elem-one (tree-elem one))
+        (elem-two (tree-elem two)))
+    (if (funcall test
+                 (funcall key elem-one)
+                 (funcall key elem-two))
+        (make-pairing-tree elem-one (list* two (tree-subheaps one)))
+        (make-pairing-tree elem-two (list* one (tree-subheaps two))))))
+
+(defun merge-pairs (subheaps key test)
+  (declare (type list subheaps)
+           (type function key test)
+           (optimize (speed 3) (safety 1)))
+  (if (endp subheaps)
+      nil
+      (let ((one (pop subheaps)))
+        (if (endp subheaps)
+            one
+            (let ((melded-pair (meld-trees one (pop subheaps) key test)))
+              (if (endp subheaps)
+                  melded-pair
+                  (meld-trees melded-pair
+                              (merge-pairs subheaps key test)
+                              key test)))))))
+
 (defstruct (pairing-heap
             (:constructor %make-pairing-heap (key test))
             (:conc-name heap-))
@@ -67,9 +95,9 @@
   (key #'identity :type function :read-only t)
   (test #'< :type function :read-only t))
 
-(defun make-heap (&key (key #'identity)
-                       (test #'<)
-                       (initial-contents '()))
+(defun create (&key (key #'identity)
+                    (test #'<)
+                    (initial-contents '()))
   (let ((heap (%make-pairing-heap (coerce key 'function)
                                   (coerce test 'function))))
     (dolist (elem initial-contents)
@@ -88,7 +116,7 @@
           (walk root 1)
           0))))
 
-(define-condition empty-heap-error ()
+(define-condition empty-heap-error (error)
   ((heap
     :initarg :heap
     :reader empty-heap-error-heap))
@@ -97,41 +125,32 @@
      (format stream "Heap ~S is empty."
              (empty-heap-error-heap condition)))))
 
-(defun find-min (heap)
+(defun empty-heap-error (heap)
+  (restart-case
+      (error 'empty-heap-error :heap heap)
+    (use-value (value)
+      :report "Specify a value to use this time."
+      :interactive (lambda ()
+                     (format *query-io*
+                             "~&Please enter a value to use (evaluated): ")
+                     (multiple-value-list (eval (read))))
+      value)))
+
+(defun front (heap &optional (errorp t) error-value)
+  "Returns the front element of the HEAP.  If HEAP is empty and ERRORP is
+true (default), then an EMPTY-HEAP-ERROR is signaled; otherwise
+ERROR-VALUE is returned."
   (declare (type pairing-heap heap))
   (let ((root (heap-root heap)))
-    (if root
-        (tree-elem root)
-        (error 'empty-heap-error :heap heap))))
-
-(defun meld-trees (one two key test)
-  (declare (type pairing-tree one two)
-           (type function key test)
-           (optimize speed))
-  (let ((elem-one (tree-elem one))
-        (elem-two (tree-elem two)))
-    (if (funcall test
-                 (funcall key elem-one)
-                 (funcall key elem-two))
-        (make-pairing-tree elem-one (list* two (tree-subheaps one)))
-        (make-pairing-tree elem-two (list* one (tree-subheaps two))))))
-
-(defun merge-pairs (subheaps key test)
-  (declare (type list subheaps)
-           (type function key test))
-  (if (endp subheaps)
-      nil
-      (let ((one (pop subheaps)))
-        (if (endp subheaps)
-            one
-            (let ((melded-pair (meld-trees one (pop subheaps) key test)))
-              (if (endp subheaps)
-                  melded-pair
-                  (meld-trees melded-pair
-                              (merge-pairs subheaps key test)
-                              key test)))))))
+    (cond (root
+           (tree-elem root))
+          (errorp
+           (empty-heap-error heap))
+          (t
+           error-value))))
 
 (defun insert (elem heap)
+  "Inserts ELEM into the HEAP."
   (declare (type pairing-heap heap))
   (let ((root (heap-root heap))
         (new (make-pairing-tree elem '())))
@@ -140,16 +159,22 @@
               (meld-trees root new (heap-key heap) (heap-test heap))
               new))))
 
-(defun delete-min (heap)
+(defun pop-front (heap &optional (errorp t) error-value)
+  "Removes and returns the front element of the HEAP.  If HEAP is empty
+and ERRORP is true (default), then an EMPTY-HEAP-ERROR is signaled;
+otherwise ERROR-VALUE is returned."
   (declare (type pairing-heap heap))
   (let ((root (heap-root heap)))
-    (if root
-        (prog1 (tree-elem root)
-          (setf (heap-root heap)
-                (merge-pairs (tree-subheaps root)
-                             (heap-key heap)
-                             (heap-test heap))))
-        (error 'empty-heap-error :heap heap))))
+    (cond (root
+           (prog1 (tree-elem root)
+             (setf (heap-root heap)
+                   (merge-pairs (tree-subheaps root)
+                                (heap-key heap)
+                                (heap-test heap)))))
+          (errorp
+           (empty-heap-error heap))
+          (t
+           error-value))))
 
 (defun emptyp (heap)
   (null (heap-root heap)))

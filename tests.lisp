@@ -13,13 +13,12 @@
                        (equals #'eql))
   (let* ((items (loop repeat n
                       collect (funcall node-constructor (random scale))))
-         (heap (ph:make-heap :test test :key key :initial-contents items)))
+         (heap (ph:create :test test :key key :initial-contents items)))
     (loop for a in (sort (copy-list items) test :key key)
-          for b = (ph:find-min heap)
+          for b = (ph:pop-front heap)
           do (assert (funcall equals
                               (funcall key a)
-                              (funcall key b)))
-             (ph:delete-min heap))
+                              (funcall key b))))
     (assert (ph:emptyp heap))
     t))
 
