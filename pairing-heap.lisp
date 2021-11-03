@@ -10,19 +10,42 @@
 ;;;
 ;;; - The recursive melding *will* exhaust stack with big enough heaps.
 ;;;
-(defstruct (pairing-tree
-            (:constructor make-pairing-tree (elem subheaps))
-            (:conc-name tree-))
-  (elem (error "Cannot have PAIRING-TREE without element."))
-  (subheaps '() :type list))
+#+pairing-heap/use-structs
+(progn
+  (defstruct (pairing-tree
+              (:constructor make-pairing-tree (elem subheaps))
+              (:conc-name tree-))
+    (elem (error "Cannot have PAIRING-TREE without element."))
+    (subheaps '() :type list))
 
-(defmethod print-object ((tree pairing-tree) stream)
-  (if *print-readably*
-      (call-next-method)
-      (print-unreadable-object (tree stream)
-        (format stream "TREE ~A ~:A"
-                (tree-elem tree)
-                (tree-subheaps tree)))))
+  (defmethod print-object ((tree pairing-tree) stream)
+    (if *print-readably*
+        (call-next-method)
+        (print-unreadable-object (tree stream)
+          (format stream "TREE ~A ~:A"
+                  (tree-elem tree)
+                  (tree-subheaps tree))))))
+
+#-pairing-heap/use-structs
+(progn
+  (deftype pairing-tree ()
+    '(cons t list))
+
+  (declaim (inline make-pairing-tree))
+  (defun make-pairing-tree (elem subheaps)
+    (cons elem subheaps))
+
+  (declaim (inline tree-elem))
+  (defun tree-elem (pairing-tree)
+    (car pairing-tree))
+
+  (declaim (inline tree-subheaps))
+  (defun tree-subheaps (pairing-tree)
+    (cdr pairing-tree)))
+
+;;; Performance is abysmal without optimization on CCL.
+#+ccl
+(declaim (optimize (speed 3) (safety 1)))
 
 (defun print-pairing-tree (tree &optional (stream *standard-output*))
   (labels ((walk-node (node prefix lastp)
