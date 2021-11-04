@@ -44,7 +44,7 @@
 ;;; Bigger heaps hurt us more.  Also we still have not figured out
 ;;; recursion.
 
-;;; SBCL:
+;;; SBCL 2.1.9.114.HEAD.3-c70665ea5:
 
 #-(and) (benchmark :n 1000 :m 500000)
 ;; PAIRING-HEAP
@@ -105,8 +105,9 @@
 ;;   21,318,623,922 processor cycles
 ;;   2,519,992,736 bytes consed
 
-;;; On CCL our library performance is abysmal.  Probably because of
-;;; allocations (even though GC time is less).
+;;; On CCL (2.1.9.114.HEAD.3-c70665ea5) our library performance is
+;;; abysmal.  Probably because of allocations (even though GC time is
+;;; less).
 
 #-(and) (benchmark :n 1000 :m 500000)
 ;; PAIRING-HEAP
