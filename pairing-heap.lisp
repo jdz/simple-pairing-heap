@@ -10,7 +10,7 @@
 ;;;
 ;;; - The recursive melding *will* exhaust stack with big enough heaps.
 ;;;
-#+pairing-heap/use-structs
+#+(or ccl pairing-heap/use-structs)
 (progn
   (defstruct (pairing-tree
               (:constructor make-pairing-tree (elem subheaps))
@@ -26,7 +26,7 @@
                   (tree-elem tree)
                   (tree-subheaps tree))))))
 
-#-pairing-heap/use-structs
+#-(or ccl pairing-heap/use-structs)
 (progn
   (deftype pairing-tree ()
     '(cons t list))
