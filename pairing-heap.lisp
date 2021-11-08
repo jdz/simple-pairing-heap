@@ -25,10 +25,10 @@
 (defmethod print-object ((tree pairing-tree) stream)
   (if *print-readably*
       (call-next-method)
-      (print-unreadable-object (tree stream)
-        (format stream "(~A ~:A)"
-                (tree-elem tree)
-                (tree-subheaps tree)))))
+      (let ((node (cons (tree-elem tree)
+                        (tree-subheaps tree))))
+        (declare (dynamic-extent node))
+        (write node :stream stream))))
 
 (defun meld-trees (one two key test)
   (declare (type pairing-tree one two)
