@@ -10,42 +10,25 @@
 ;;;
 ;;; - The recursive melding *will* exhaust stack with big enough heaps.
 ;;;
-#+(or ccl pairing-heap/use-structs)
-(progn
-  (defstruct (pairing-tree
-              (:constructor make-pairing-tree (elem subheaps))
-              (:conc-name tree-))
-    (elem (error "Cannot have PAIRING-TREE without element."))
-    (subheaps '() :type list))
 
-  (defmethod print-object ((tree pairing-tree) stream)
-    (if *print-readably*
-        (call-next-method)
-        (print-unreadable-object (tree stream)
-          (format stream "TREE ~A ~:A"
-                  (tree-elem tree)
-                  (tree-subheaps tree))))))
-
-#-(or ccl pairing-heap/use-structs)
-(progn
-  (deftype pairing-tree ()
-    '(cons t list))
-
-  (declaim (inline make-pairing-tree))
-  (defun make-pairing-tree (elem subheaps)
-    (cons elem subheaps))
-
-  (declaim (inline tree-elem))
-  (defun tree-elem (pairing-tree)
-    (car pairing-tree))
-
-  (declaim (inline tree-subheaps))
-  (defun tree-subheaps (pairing-tree)
-    (cdr pairing-tree)))
-
-;;; Performance is abysmal without optimization on CCL.
+;;; Performance is abysmal without this declamation on CCL.  With this
+;;; we're approximately twice as fast as implementation in bodge-heap.
 #+ccl
 (declaim (optimize (speed 3) (safety 1)))
+
+(defstruct (pairing-tree
+            (:constructor make-pairing-tree (elem subheaps))
+            (:conc-name tree-))
+  (elem (error "Cannot have PAIRING-TREE without element."))
+  (subheaps '() :type list))
+
+(defmethod print-object ((tree pairing-tree) stream)
+  (if *print-readably*
+      (call-next-method)
+      (print-unreadable-object (tree stream)
+        (format stream "(~A ~:A)"
+                (tree-elem tree)
+                (tree-subheaps tree)))))
 
 (defun meld-trees (one two key test)
   (declare (type pairing-tree one two)
@@ -138,7 +121,6 @@ ERROR-VALUE is returned."
   "Removes and returns the front element of the HEAP.  If HEAP is empty
 and ERRORP is true (default), then an EMPTY-HEAP-ERROR is signaled;
 otherwise ERROR-VALUE is returned."
-  (declare (type pairing-heap heap))
   (let ((root (heap-root heap)))
     (cond (root
            (prog1 (tree-elem root)
