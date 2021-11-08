@@ -1,6 +1,7 @@
 (defpackage #:pairing-heap
   (:use #:common-lisp)
-  (:export #:create
+  (:export #:pairing-heap
+           #:create
            #:insert
            #:front
            #:pop-front
