@@ -47,19 +47,6 @@
 #+ccl
 (declaim (optimize (speed 3) (safety 1)))
 
-(defun print-pairing-tree (tree &optional (stream *standard-output*))
-  (labels ((walk-node (node prefix lastp)
-             (format stream "~&~{~A~}~:[├~;└~]─ ~A~%"
-                     prefix lastp (tree-elem node))
-             (walk-children (tree-subheaps node)
-                            (append prefix (list (if lastp "   " "│  ")))))
-           (walk-children (list prefix)
-             (loop for (node . more) on list
-                   do (walk-node node prefix (null more)))))
-    (format stream "~&~A~%" (tree-elem tree))
-    (walk-children (tree-subheaps tree) nil)
-    tree))
-
 (defun meld-trees (one two key test)
   (declare (type pairing-tree one two)
            (type function key test)
@@ -103,18 +90,6 @@
     (dolist (elem initial-contents)
       (insert elem heap))
     heap))
-
-(defun heap-depth (heap)
-  (labels ((walk (tree depth)
-             (let ((subs (tree-subheaps tree)))
-               (if subs
-                   (loop for sub in (tree-subheaps tree)
-                         maximizing (walk sub (1+ depth)))
-                   depth))))
-    (let ((root (heap-root heap)))
-      (if root
-          (walk root 1)
-          0))))
 
 (define-condition empty-heap-error (error)
   ((heap
