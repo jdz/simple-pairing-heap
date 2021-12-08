@@ -7,9 +7,6 @@
 ;;; - SUBHEAPS are actually subtrees.
 ;;;
 ;;; - We might want to extract KEY at node construction time.
-;;;
-;;; - The recursive melding *will* exhaust stack with big enough heaps.
-;;;
 
 ;;; Performance is abysmal without this declamation on CCL.  With this
 ;;; we're approximately twice as fast as implementation in bodge-heap.
@@ -61,7 +58,7 @@
         (make-pairing-tree elem-one (list* two (tree-subheaps one)))
         (make-pairing-tree elem-two (list* one (tree-subheaps two))))))
 
-(defun merge-pairs (subheaps key test)
+(defun merge-pairs/recursive (subheaps key test)
   (declare (type list subheaps)
            (type function key test)
            (optimize (speed 3) (safety 1)))
@@ -74,21 +71,54 @@
               (if (endp subheaps)
                   melded-pair
                   (meld-trees melded-pair
-                              (merge-pairs subheaps key test)
+                              (merge-pairs/recursive subheaps key test)
                               key test)))))))
 
+(defun merge-pairs/consing (subheaps key test)
+  (declare (type list subheaps)
+           (type function key test)
+           (optimize (speed 3) (safety 1)))
+  (labels ((ltr (list result)
+             (if (endp list)
+                 result
+                 (let ((one (pop list)))
+                   (if (endp list)
+                       (cons one result)
+                       (let ((two (pop list)))
+                         (ltr list
+                              (list* (meld-trees one two key test)
+                                     result)))))))
+           (rtl (head tail)
+             (if tail
+                 (rtl (meld-trees head (first tail) key test)
+                      (rest tail))
+                 head)))
+    (let ((melded (ltr subheaps '())))
+      (rtl (first melded)
+           (rest melded)))))
+
 (defstruct (pairing-heap
-            (:constructor %make-pairing-heap (key test))
+            (:constructor %make-pairing-heap (key test merge-pairs-fn))
             (:conc-name heap-))
   (root nil :type (or null pairing-tree))
   (key #'identity :type function :read-only t)
-  (test #'< :type function :read-only t))
+  (test #'< :type function :read-only t)
+  (merge-pairs-fn #'merge-pairs/consing :type function :read-only t))
 
 (defun create (&key (key #'identity)
                     (test #'<)
-                    (initial-contents '()))
+                    (initial-contents '())
+                    (recursive-merge nil))
+  "Create and return new PAIRING-HEAP.  Items added to the heap will be
+sorted using the provided TEST function, applied to results of calling
+KEY function on each item.  If RECURSIVE-MERGE is true (default is
+false) then a recursive MERGE-PAIRS function will be used to maintain
+the heap, but this may exhaust call stack on big heaps."
   (let ((heap (%make-pairing-heap (coerce key 'function)
-                                  (coerce test 'function))))
+                                  (coerce test 'function)
+                                  (if recursive-merge
+                                      #'merge-pairs/recursive
+                                      #'merge-pairs/consing))))
     (dolist (elem initial-contents)
       (insert elem heap))
     heap))
@@ -144,9 +174,10 @@ otherwise ERROR-VALUE is returned."
     (cond (root
            (prog1 (tree-elem root)
              (setf (heap-root heap)
-                   (merge-pairs (tree-subheaps root)
-                                (heap-key heap)
-                                (heap-test heap)))))
+                   (funcall (heap-merge-pairs-fn heap)
+                            (tree-subheaps root)
+                            (heap-key heap)
+                            (heap-test heap)))))
           (errorp
            (empty-heap-error heap))
           (t

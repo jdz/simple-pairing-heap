@@ -26,28 +26,3 @@
         (format stream "~&~A~%" (tree-elem root))
         (walk-children (tree-subheaps root) nil)))
     heap))
-
-;;; Non-recursive version of MERGE-PAIRS.
-(defun merge-pairs (subheaps key test)
-  (declare (type list subheaps)
-           (type function key test)
-           (optimize (speed 3) (safety 1)))
-  (labels ((ltr (list result)
-             (if (endp list)
-                 result
-                 (let ((one (pop list)))
-                   (if (endp list)
-                       (list* one result)
-                       (let ((two (pop list)))
-                         (ltr list
-                              (list* (meld-trees one two key test)
-                                     result)))))))
-           (rtl (head tail)
-             (if tail
-                 (rtl (meld-trees head (first tail) key test)
-                      (rest tail))
-                 head)))
-    (let ((melded (ltr subheaps '())))
-      (declare (dynamic-extent melded))
-      (rtl (first melded)
-           (rest melded)))))
