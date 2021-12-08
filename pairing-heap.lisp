@@ -147,7 +147,6 @@ the heap, but this may exhaust call stack on big heaps."
   "Returns the front element of the HEAP.  If HEAP is empty and ERRORP is
 true (default), then an EMPTY-HEAP-ERROR is signaled; otherwise
 ERROR-VALUE is returned."
-  (declare (type pairing-heap heap))
   (let ((root (heap-root heap)))
     (cond (root
            (tree-elem root))
@@ -158,7 +157,6 @@ ERROR-VALUE is returned."
 
 (defun insert (elem heap)
   "Inserts ELEM into the HEAP."
-  (declare (type pairing-heap heap))
   (let ((root (heap-root heap))
         (new (make-pairing-tree elem '())))
     (setf (heap-root heap)
