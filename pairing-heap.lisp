@@ -1,4 +1,4 @@
-(in-package #:pairing-heap)
+(in-package #:simple-pairing-heap)
 
 ;;; https://en.wikipedia.org/wiki/Pairing_heap
 ;;;

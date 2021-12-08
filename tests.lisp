@@ -1,9 +1,9 @@
-(defpackage #:pairing-heap.tests
+(defpackage #:simple-pairing-heap.tests
   (:use #:common-lisp)
-  (:local-nicknames (#:ph #:pairing-heap))
+  (:local-nicknames (#:ph #:simple-pairing-heap))
   (:export #:run-tests))
 
-(in-package #:pairing-heap.tests)
+(in-package #:simple-pairing-heap.tests)
 
 (defun test-heap (&key (n 1000)
                        (scale (expt n 2))

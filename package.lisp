@@ -1,4 +1,4 @@
-(defpackage #:pairing-heap
+(defpackage #:simple-pairing-heap
   (:use #:common-lisp)
   (:export #:pairing-heap
            #:create

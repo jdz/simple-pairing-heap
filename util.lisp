@@ -1,4 +1,4 @@
-(in-package #:pairing-heap)
+(in-package #:simple-pairing-heap)
 
 (defun heap-depth (heap)
   (labels ((walk (tree depth)
