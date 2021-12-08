@@ -23,9 +23,7 @@ benchmark blocks (using ~C-c C-c~).
     (unless (find-package '#:bodge-heap)
       (ql:quickload "bodge-heap"))
     (unless (find-package '#:damn-fast-priority-queue)
-      (ql:quickload "damn-fast-priority-queue"))
-    (unless (find-package '#:pairing-elmasri)
-      (ql:quickload "minheap")))
+      (ql:quickload "damn-fast-priority-queue")))
 #+end_src
 
 #+caption: Benchmark code
@@ -62,14 +60,6 @@ benchmark blocks (using ~C-c C-c~).
                (simple-pairing-heap:create :key key)
                (simple-pairing-heap:insert item heap)
                (simple-pairing-heap:pop-front heap))
-        (bench (heap item "MINHEAP (pairing)")
-               (make-instance 'pairing-heap:pairing-heap)
-               (pairing-heap:insert heap (funcall key item) item)
-               (pairing-heap:extract-min heap))
-        (bench (heap item "MINHEAP (pairing, Elmasri)")
-               (make-instance 'pairing-elmasri:pairing-elmasri)
-               (pairing-elmasri:insert heap (funcall key item) item)
-               (pairing-elmasri:extract-min heap))
         (bench (heap item "BODGE-HEAP (pairing)")
                (bodge-heap:make-pairing-heap :key key)
                (bodge-heap:pairing-heap-push heap item)
@@ -144,24 +134,6 @@ Evaluation took:
   2,895,176,756 processor cycles
   1,348,038,512 bytes consed
 
-MINHEAP (pairing)
-Evaluation took:
-  1.400 seconds of real time
-  1.407986 seconds of total run time (1.404699 user, 0.003287 system)
-  [ Run times consist of 0.008 seconds GC time, and 1.400 seconds non-GC time. ]
-  100.57% CPU
-  5,313,421,706 processor cycles
-  1,202,396,576 bytes consed
-
-MINHEAP (pairing, Elmasri)
-Evaluation took:
-  1.936 seconds of real time
-  1.948801 seconds of total run time (1.948725 user, 0.000076 system)
-  [ Run times consist of 0.015 seconds GC time, and 1.934 seconds non-GC time. ]
-  100.67% CPU
-  7,344,917,362 processor cycles
-  1,603,193,808 bytes consed
-
 BODGE-HEAP (pairing)
 Evaluation took:
   0.820 seconds of real time
@@ -194,24 +166,6 @@ Evaluation took:
   24,982,897,308 processor cycles
   12,204,579,856 bytes consed
 
-MINHEAP (pairing)
-Evaluation took:
-  13.543 seconds of real time
-  13.584072 seconds of total run time (13.578541 user, 0.005531 system)
-  [ Run times consist of 0.107 seconds GC time, and 13.478 seconds non-GC time. ]
-  100.30% CPU
-  51,377,003,580 processor cycles
-  12,002,387,424 bytes consed
-
-MINHEAP (pairing, Elmasri)
-Evaluation took:
-  18.553 seconds of real time
-  18.617228 seconds of total run time (18.594634 user, 0.022594 system)
-  [ Run times consist of 0.155 seconds GC time, and 18.463 seconds non-GC time. ]
-  100.34% CPU
-  70,359,583,088 processor cycles
-  16,003,194,896 bytes consed
-
 BODGE-HEAP (pairing)
 Evaluation took:
   7.283 seconds of real time
@@ -243,24 +197,6 @@ Evaluation took:
   100.55% CPU
   25,531,854,694 processor cycles
   8,171,258,784 bytes consed
-
-MINHEAP (pairing)
-Evaluation took:
-  5.216 seconds of real time
-  5.220717 seconds of total run time (5.214318 user, 0.006399 system)
-  [ Run times consist of 0.084 seconds GC time, and 5.137 seconds non-GC time. ]
-  100.10% CPU
-  19,787,099,776 processor cycles
-  2,520,009,072 bytes consed
-
-MINHEAP (pairing, Elmasri)
-Evaluation took:
-  6.373 seconds of real time
-  6.385038 seconds of total run time (6.318353 user, 0.066685 system)
-  [ Run times consist of 0.141 seconds GC time, and 6.245 seconds non-GC time. ]
-  100.19% CPU
-  24,173,332,236 processor cycles
-  3,359,998,736 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
@@ -297,24 +233,6 @@ During that period, and with 16 available CPU cores,
         50,635 microseconds (0.050635 seconds) were spent in system mode
  2,225,620,800 bytes of memory allocated.
  226 minor page faults, 0 major page faults, 0 swaps.
-MINHEAP (pairing)
-(LOOP REPEAT REPEAT DO (RUN))
-took 12,416,286 microseconds (12.416286 seconds) to run.
-        244,606 microseconds ( 0.244606 seconds, 1.97%) of which was spent in GC.
-During that period, and with 16 available CPU cores,
-     12,972,504 microseconds (12.972504 seconds) were spent in user mode
-         64,660 microseconds ( 0.064660 seconds) were spent in system mode
- 1,603,203,200 bytes of memory allocated.
- 387 minor page faults, 0 major page faults, 0 swaps.
-MINHEAP (pairing, Elmasri)
-(LOOP REPEAT REPEAT DO (RUN))
-took 22,119,350 microseconds (22.119350 seconds) to run.
-        338,923 microseconds ( 0.338923 seconds, 1.53%) of which was spent in GC.
-During that period, and with 16 available CPU cores,
-     22,630,393 microseconds (22.630392 seconds) were spent in user mode
-         46,103 microseconds ( 0.046103 seconds) were spent in system mode
- 1,603,204,800 bytes of memory allocated.
- 355 minor page faults, 0 major page faults, 0 swaps.
 BODGE-HEAP (pairing)
 (LOOP REPEAT REPEAT DO (RUN))
 took 5,112,480 microseconds (5.112480 seconds) to run.
@@ -333,7 +251,41 @@ During that period, and with 16 available CPU cores,
  1,089,600 bytes of memory allocated.
 #+end_example
 
-The slower heap implementations take too long to run.
+#+call: run-benchmark(1000, 5000000)
+
+#+RESULTS:
+#+begin_example
+Heap of size 1000, with 5000000 reinserts, Clozure Common Lisp Version 1.12 (v1.12-33-gc94c3a88) LinuxX8664
+SIMPLE-PAIRING-HEAP
+(LOOP REPEAT REPEAT DO (RUN))
+took 28,765,447 microseconds (28.765448 seconds) to run.
+        602,578 microseconds ( 0.602578 seconds, 2.09%) of which was spent in GC.
+During that period, and with 16 available CPU cores,
+     29,240,819 microseconds (29.240820 seconds) were spent in user mode
+        533,169 microseconds ( 0.533169 seconds) were spent in system mode
+ 20,306,474,400 bytes of memory allocated.
+ 513 minor page faults, 0 major page faults, 0 swaps.
+BODGE-HEAP (pairing)
+(LOOP REPEAT REPEAT DO (RUN))
+took 46,026,211 microseconds (46.026210 seconds) to run.
+      1,689,235 microseconds ( 1.689235 seconds, 3.67%) of which was spent in GC.
+During that period, and with 16 available CPU cores,
+     49,553,427 microseconds (49.553430 seconds) were spent in user mode
+        714,312 microseconds ( 0.714312 seconds) were spent in system mode
+ 12,002,401,600 bytes of memory allocated.
+ 288 minor page faults, 0 major page faults, 0 swaps.
+DAMN-FAST-PRIORITY-QUEUE
+(LOOP REPEAT REPEAT DO (RUN))
+took 68,002,159 microseconds (68.002160 seconds) to run.
+            568 microseconds ( 0.000568 seconds, 0.00%) of which was spent in GC.
+During that period, and with 16 available CPU cores,
+     67,986,227 microseconds (67.986220 seconds) were spent in user mode
+              0 microseconds ( 0.000000 seconds) were spent in system mode
+ 1,089,600 bytes of memory allocated.
+#+end_example
+
+The last benchmark (size ~50000~, ~1000000~ reinserts) takes too long (and
+eats memory like crazy), so not included.
 
 ** SBCL
 
