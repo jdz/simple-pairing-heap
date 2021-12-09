@@ -1,7 +1,8 @@
 (defsystem "simple-pairing-heap"
   :description "Pairing heap implementaton"
   :author "Jānis Džeriņš <lisp@jonis.lv>"
-  :license "Zlib"
+  :license "zlib"
+  :source-control (:git "https://github.com/jdz/simple-pairing-heap.git")
   :long-description "Straight implementation of pairing heap, as described
   in https://en.wikipedia.org/wiki/Pairing_heap."
   :components ((:file "package")
