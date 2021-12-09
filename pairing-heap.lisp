@@ -16,19 +16,38 @@
 #+ccl
 (declaim (optimize (speed 3) (safety 1)))
 
-(defstruct (pairing-tree
-            (:constructor make-pairing-tree (elem subheaps))
-            (:conc-name tree-))
-  (elem (error "Cannot have PAIRING-TREE without element."))
-  (subheaps '() :type list))
+#+(or ccl pairing-heap/use-structs)
+(progn
+  (defstruct (pairing-tree
+              (:constructor make-pairing-tree (elem subheaps))
+              (:conc-name tree-))
+    (elem (error "Cannot have PAIRING-TREE without element."))
+    (subheaps '() :type list))
 
-(defmethod print-object ((tree pairing-tree) stream)
-  (if *print-readably*
-      (call-next-method)
-      (let ((node (cons (tree-elem tree)
-                        (tree-subheaps tree))))
-        (declare (dynamic-extent node))
-        (write node :stream stream))))
+  (defmethod print-object ((tree pairing-tree) stream)
+    (if *print-readably*
+        (call-next-method)
+        (let ((node (cons (tree-elem tree)
+                          (tree-subheaps tree))))
+          (declare (dynamic-extent node))
+          (write node :stream stream)))))
+
+#-(or ccl pairing-heap/use-structs)
+(progn
+  (deftype pairing-tree ()
+    '(cons t list))
+
+  (declaim (inline make-pairing-tree))
+  (defun make-pairing-tree (elem subheaps)
+    (cons elem subheaps))
+
+  (declaim (inline tree-elem))
+  (defun tree-elem (pairing-tree)
+    (car pairing-tree))
+
+  (declaim (inline tree-subheaps))
+  (defun tree-subheaps (pairing-tree)
+    (cdr pairing-tree)))
 
 (defun meld-trees (one two key test)
   (declare (type pairing-tree one two)
