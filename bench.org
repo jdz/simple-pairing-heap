@@ -144,41 +144,41 @@ Other benchmarks take even longer, so not even trying.
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.2.0.8.HEAD.3-3e4090d05
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  0.763 seconds of real time
-  0.786732 seconds of total run time (0.776465 user, 0.010267 system)
-  [ Run times consist of 0.035 seconds GC time, and 0.752 seconds non-GC time. ]
-  103.15% CPU
-  2,888,818,634 processor cycles
-  1,347,940,320 bytes consed
+  0.779 seconds of real time
+  0.837715 seconds of total run time (0.833231 user, 0.004484 system)
+  [ Run times consist of 0.037 seconds GC time, and 0.801 seconds non-GC time. ]
+  107.57% CPU
+  2,956,471,668 processor cycles
+  1,351,826,176 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  0.833 seconds of real time
-  0.871658 seconds of total run time (0.871346 user, 0.000312 system)
-  [ Run times consist of 0.048 seconds GC time, and 0.824 seconds non-GC time. ]
-  104.68% CPU
-  3,163,692,850 processor cycles
-  1,783,124,880 bytes consed
+  0.846 seconds of real time
+  0.923098 seconds of total run time (0.908034 user, 0.015064 system)
+  [ Run times consist of 0.051 seconds GC time, and 0.873 seconds non-GC time. ]
+  109.10% CPU
+  3,210,487,380 processor cycles
+  1,787,915,280 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  0.826 seconds of real time
-  0.862276 seconds of total run time (0.845106 user, 0.017170 system)
-  [ Run times consist of 0.032 seconds GC time, and 0.831 seconds non-GC time. ]
-  104.36% CPU
-  3,138,480,762 processor cycles
-  1,202,405,456 bytes consed
+  0.856 seconds of real time
+  0.907253 seconds of total run time (0.903095 user, 0.004158 system)
+  [ Run times consist of 0.033 seconds GC time, and 0.875 seconds non-GC time. ]
+  105.96% CPU
+  3,247,868,132 processor cycles
+  1,202,396,912 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  1.333 seconds of real time
-  1.333346 seconds of total run time (1.333346 user, 0.000000 system)
-  100.00% CPU
-  5,058,730,772 processor cycles
+  1.339 seconds of real time
+  1.340326 seconds of total run time (1.340326 user, 0.000000 system)
+  100.07% CPU
+  5,085,021,452 processor cycles
   1,082,448 bytes consed
 #+end_example
 
@@ -186,41 +186,41 @@ Evaluation took:
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.2.0.8.HEAD.3-3e4090d05
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  6.950 seconds of real time
-  6.888243 seconds of total run time (6.828787 user, 0.059456 system)
-  [ Run times consist of 0.314 seconds GC time, and 6.575 seconds non-GC time. ]
-  99.11% CPU
-  26,353,873,316 processor cycles
-  12,202,956,656 bytes consed
+  6.679 seconds of real time
+  6.835573 seconds of total run time (6.807071 user, 0.028502 system)
+  [ Run times consist of 0.319 seconds GC time, and 6.517 seconds non-GC time. ]
+  102.35% CPU
+  25,344,338,640 processor cycles
+  12,200,987,376 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  7.453 seconds of real time
-  7.411644 seconds of total run time (6.962900 user, 0.448744 system)
-  [ Run times consist of 0.404 seconds GC time, and 7.008 seconds non-GC time. ]
-  99.45% CPU
-  28,265,534,756 processor cycles
-  16,251,418,928 bytes consed
+  7.083 seconds of real time
+  7.363900 seconds of total run time (7.287166 user, 0.076734 system)
+  [ Run times consist of 0.399 seconds GC time, and 6.965 seconds non-GC time. ]
+  103.97% CPU
+  26,866,517,484 processor cycles
+  16,248,905,616 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  7.630 seconds of real time
-  7.716263 seconds of total run time (7.675851 user, 0.040412 system)
-  [ Run times consist of 0.308 seconds GC time, and 7.409 seconds non-GC time. ]
-  101.13% CPU
-  28,946,136,568 processor cycles
-  12,002,405,168 bytes consed
+  7.519 seconds of real time
+  7.735332 seconds of total run time (7.666624 user, 0.068708 system)
+  [ Run times consist of 0.306 seconds GC time, and 7.430 seconds non-GC time. ]
+  102.87% CPU
+  28,524,387,640 processor cycles
+  12,002,387,648 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  13.313 seconds of real time
-  13.309240 seconds of total run time (13.309240 user, 0.000000 system)
-  99.97% CPU
-  50,496,277,618 processor cycles
+  13.316 seconds of real time
+  13.315600 seconds of total run time (13.315600 user, 0.000000 system)
+  100.00% CPU
+  50,518,632,562 processor cycles
   1,082,448 bytes consed
 #+end_example
 
@@ -228,42 +228,42 @@ Evaluation took:
 
 #+RESULTS:
 #+begin_example
-Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.2.0.8.HEAD.3-3e4090d05
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  7.146 seconds of real time
-  7.533827 seconds of total run time (7.301694 user, 0.232133 system)
-  [ Run times consist of 0.851 seconds GC time, and 6.683 seconds non-GC time. ]
-  105.43% CPU
-  27,111,887,398 processor cycles
-  8,199,428,736 bytes consed
+  7.179 seconds of real time
+  7.424092 seconds of total run time (7.172584 user, 0.251508 system)
+  [ Run times consist of 0.864 seconds GC time, and 6.561 seconds non-GC time. ]
+  103.41% CPU
+  27,229,447,998 processor cycles
+  8,181,772,016 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  7.856 seconds of real time
-  8.288350 seconds of total run time (8.061859 user, 0.226491 system)
-  [ Run times consist of 1.024 seconds GC time, and 7.265 seconds non-GC time. ]
-  105.50% CPU
-  29,792,807,044 processor cycles
-  10,388,721,232 bytes consed
+  7.896 seconds of real time
+  8.265062 seconds of total run time (8.030026 user, 0.235036 system)
+  [ Run times consist of 1.044 seconds GC time, and 7.222 seconds non-GC time. ]
+  104.67% CPU
+  29,957,732,326 processor cycles
+  10,366,725,472 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  5.853 seconds of real time
-  5.961893 seconds of total run time (5.869954 user, 0.091939 system)
-  [ Run times consist of 0.463 seconds GC time, and 5.499 seconds non-GC time. ]
-  101.86% CPU
-  22,203,858,014 processor cycles
-  2,520,000,528 bytes consed
+  5.903 seconds of real time
+  5.974770 seconds of total run time (5.877492 user, 0.097278 system)
+  [ Run times consist of 0.474 seconds GC time, and 5.501 seconds non-GC time. ]
+  101.22% CPU
+  22,390,167,948 processor cycles
+  2,519,997,936 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  4.560 seconds of real time
-  4.559151 seconds of total run time (4.556402 user, 0.002749 system)
-  [ Run times consist of 0.001 seconds GC time, and 4.559 seconds non-GC time. ]
-  99.98% CPU
-  17,288,751,662 processor cycles
+  4.479 seconds of real time
+  4.481100 seconds of total run time (4.473366 user, 0.007734 system)
+  [ Run times consist of 0.001 seconds GC time, and 4.481 seconds non-GC time. ]
+  100.04% CPU
+  16,998,774,384 processor cycles
   78,473,680 bytes consed
 #+end_example
 
