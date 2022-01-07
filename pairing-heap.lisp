@@ -13,23 +13,24 @@
 #+ccl
 (declaim (optimize (speed 3) (safety 1)))
 
-#+(or ccl pairing-heap/use-structs)
 (progn
   (defstruct (pairing-tree
-              (:constructor make-pairing-tree (elem subheaps))
+              (:constructor make-pairing-tree (key elem subheaps))
               (:conc-name tree-))
+    (key (error "Cannot have PAIRING-TREE without key."))
     (elem (error "Cannot have PAIRING-TREE without element."))
     (subheaps '() :type list))
 
   (defmethod print-object ((tree pairing-tree) stream)
     (if *print-readably*
         (call-next-method)
-        (let ((node (cons (tree-elem tree)
+        (let ((node (list (tree-key tree)
+                          (tree-elem tree)
                           (tree-subheaps tree))))
           (declare (dynamic-extent node))
           (write node :stream stream)))))
 
-#-(or ccl pairing-heap/use-structs)
+#-(and)
 (progn
   (deftype pairing-tree ()
     '(cons t list))
@@ -46,37 +47,37 @@
   (defun tree-subheaps (pairing-tree)
     (cdr pairing-tree)))
 
-(defun meld-trees (one two key test)
+(defun meld-trees (one two test)
   (declare (type pairing-tree one two)
-           (type function key test)
+           (type function test)
            (optimize (speed 3) (safety 1)))
-  (let ((elem-one (tree-elem one))
+  (let ((key-one (tree-key one))
+        (key-two (tree-key two))
+        (elem-one (tree-elem one))
         (elem-two (tree-elem two)))
-    (if (funcall test
-                 (funcall key elem-one)
-                 (funcall key elem-two))
-        (make-pairing-tree elem-one (list* two (tree-subheaps one)))
-        (make-pairing-tree elem-two (list* one (tree-subheaps two))))))
+    (if (funcall test key-one key-two)
+        (make-pairing-tree key-one elem-one (list* two (tree-subheaps one)))
+        (make-pairing-tree key-two elem-two (list* one (tree-subheaps two))))))
 
-(defun merge-pairs/recursive (subheaps key test)
+(defun merge-pairs/recursive (subheaps test)
   (declare (type list subheaps)
-           (type function key test)
+           (type function test)
            (optimize (speed 3) (safety 1)))
   (if (endp subheaps)
       nil
       (let ((one (pop subheaps)))
         (if (endp subheaps)
             one
-            (let ((melded-pair (meld-trees one (pop subheaps) key test)))
+            (let ((melded-pair (meld-trees one (pop subheaps) test)))
               (if (endp subheaps)
                   melded-pair
                   (meld-trees melded-pair
-                              (merge-pairs/recursive subheaps key test)
-                              key test)))))))
+                              (merge-pairs/recursive subheaps test)
+                              test)))))))
 
-(defun merge-pairs/consing (subheaps key test)
+(defun merge-pairs/consing (subheaps test)
   (declare (type list subheaps)
-           (type function key test)
+           (type function test)
            (optimize (speed 3) (safety 1)))
   (labels ((ltr (list result)
              (if (endp list)
@@ -86,11 +87,11 @@
                        (cons one result)
                        (let ((two (pop list)))
                          (ltr list
-                              (list* (meld-trees one two key test)
+                              (list* (meld-trees one two test)
                                      result)))))))
            (rtl (head tail)
              (if tail
-                 (rtl (meld-trees head (first tail) key test)
+                 (rtl (meld-trees head (first tail) test)
                       (rest tail))
                  head)))
     (let ((melded (ltr subheaps '())))
@@ -98,30 +99,23 @@
            (rest melded)))))
 
 (defstruct (pairing-heap
-            (:constructor %make-pairing-heap (key test merge-pairs-fn))
+            (:constructor %make-pairing-heap (test merge-pairs-fn))
             (:conc-name heap-))
   (root nil :type (or null pairing-tree))
-  (key #'identity :type function :read-only t)
   (test #'< :type function :read-only t)
   (merge-pairs-fn #'merge-pairs/consing :type function :read-only t))
 
-(defun create (&key (key #'identity)
-                    (test #'<)
-                    (initial-contents '())
+(defun create (&key (test #'<)
                     (recursive-merge nil))
   "Create and return new PAIRING-HEAP.  Items added to the heap will be
-sorted using the provided TEST function, applied to results of calling
-KEY function on each item.  If RECURSIVE-MERGE is true (default is
-false) then a recursive MERGE-PAIRS function will be used to maintain
-the heap, but this may exhaust call stack on big heaps."
-  (let ((heap (%make-pairing-heap (coerce key 'function)
-                                  (coerce test 'function)
-                                  (if recursive-merge
-                                      #'merge-pairs/recursive
-                                      #'merge-pairs/consing))))
-    (dolist (elem initial-contents)
-      (insert elem heap))
-    heap))
+sorted using the provided TEST function.  If RECURSIVE-MERGE is
+true (default is false) then a recursive MERGE-PAIRS function will be
+used to maintain the heap, but this may exhaust call stack on big
+heaps."
+  (%make-pairing-heap (coerce test 'function)
+                      (if recursive-merge
+                          #'merge-pairs/recursive
+                          #'merge-pairs/consing)))
 
 (define-condition empty-heap-error (error)
   ((heap
@@ -155,13 +149,13 @@ ERROR-VALUE is returned."
           (t
            error-value))))
 
-(defun insert (elem heap)
+(defun insert (elem heap key)
   "Inserts ELEM into the HEAP."
   (let ((root (heap-root heap))
-        (new (make-pairing-tree elem '())))
+        (new (make-pairing-tree key elem '())))
     (setf (heap-root heap)
           (if root
-              (meld-trees root new (heap-key heap) (heap-test heap))
+              (meld-trees root new (heap-test heap))
               new))))
 
 (defun pop-front (heap &optional (errorp t) error-value)
@@ -174,7 +168,6 @@ otherwise ERROR-VALUE is returned."
              (setf (heap-root heap)
                    (funcall (heap-merge-pairs-fn heap)
                             (tree-subheaps root)
-                            (heap-key heap)
                             (heap-test heap)))))
           (errorp
            (empty-heap-error heap))

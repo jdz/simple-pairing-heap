@@ -15,9 +15,9 @@
   (let* ((items (loop repeat n
                       collect (funcall node-constructor (random scale))))
          (heap (ph:create :test test
-                          :key key
-                          :recursive-merge recursive
-                          :initial-contents items)))
+                          :recursive-merge recursive)))
+    (loop for item in items
+          do (ph:insert item heap (funcall key item)))
     (loop for a in (sort (copy-list items) test :key key)
           for b = (ph:pop-front heap)
           do (assert (funcall equals
@@ -31,11 +31,10 @@
                   &allow-other-keys )
   (declare (ignorable n))
   (loop for recursive in '(t nil)
-        do (apply #'test-heap :test #'< args)
-           (apply #'test-heap :test #'> args)
+        do (apply #'test-heap :test #'< :recursive recursive args)
+           (apply #'test-heap :test #'> :recursive recursive args)
            (let ((args (list* :key #'car
-                              :node-constructor (lambda (n)
-                                                  (cons n (format nil "~R" n)))
+                              :node-constructor (lambda (n) (cons n nil))
                               args)))
-             (apply #'test-heap :test #'< args)
-             (apply #'test-heap :test #'> args))))
+             (apply #'test-heap :test #'< :recursive recursive args)
+             (apply #'test-heap :test #'> :recursive recursive args))))

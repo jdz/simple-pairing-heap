@@ -63,12 +63,12 @@ benchmark blocks (using ~C-c C-c~).
                 n m repeat
                 (lisp-implementation-type) (lisp-implementation-version))
         (bench (heap item "SIMPLE-PAIRING-HEAP (recursive)")
-               (simple-pairing-heap:create :key key :recursive-merge t)
-               (simple-pairing-heap:insert item heap)
+               (simple-pairing-heap:create :recursive-merge t)
+               (simple-pairing-heap:insert item heap (funcall key item))
                (simple-pairing-heap:pop-front heap))
         (bench (heap item "SIMPLE-PAIRING-HEAP (consing)")
-               (simple-pairing-heap:create :key key)
-               (simple-pairing-heap:insert item heap)
+               (simple-pairing-heap:create)
+               (simple-pairing-heap:insert item heap (funcall key item))
                (simple-pairing-heap:pop-front heap))
         (bench (heap item "BODGE-HEAP (pairing)")
                (bodge-heap:make-pairing-heap :key key)
@@ -278,37 +278,36 @@ Heap of size 1000, with 500000 reinserts (×50), on Clozure Common Lisp Version 
 
 SIMPLE-PAIRING-HEAP (recursive)
 (LOOP REPEAT REPEAT DO (RUN))
-took 2,662,240 microseconds (2.662240 seconds) to run.
-       111,134 microseconds (0.111134 seconds, 4.17%) of which was spent in GC.
+took 2,776,104 microseconds (2.776104 seconds) to run.
+       114,366 microseconds (0.114366 seconds, 4.12%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     2,742,880 microseconds (2.742880 seconds) were spent in user mode
-        21,830 microseconds (0.021830 seconds) were spent in system mode
- 2,221,867,200 bytes of memory allocated.
- 225 minor page faults, 0 major page faults, 0 swaps.
+     2,858,273 microseconds (2.858273 seconds) were spent in user mode
+        66,525 microseconds (0.066525 seconds) were spent in system mode
+ 3,096,088,800 bytes of memory allocated.
+ 451 minor page faults, 0 major page faults, 0 swaps.
 SIMPLE-PAIRING-HEAP (consing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 3,675,276 microseconds (3.675276 seconds) to run.
-       130,924 microseconds (0.130924 seconds, 3.56%) of which was spent in GC.
+took 3,343,017 microseconds (3.343017 seconds) to run.
+       129,661 microseconds (0.129661 seconds, 3.88%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     3,740,154 microseconds (3.740154 seconds) were spent in user mode
-        61,855 microseconds (0.061855 seconds) were spent in system mode
- 2,656,940,800 bytes of memory allocated.
- 225 minor page faults, 0 major page faults, 0 swaps.
+     3,427,226 microseconds (3.427226 seconds) were spent in user mode
+        84,112 microseconds (0.084112 seconds) were spent in system mode
+ 3,531,162,400 bytes of memory allocated.
+ 451 minor page faults, 0 major page faults, 0 swaps.
 BODGE-HEAP (pairing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 4,407,180 microseconds (4.407180 seconds) to run.
-       168,476 microseconds (0.168476 seconds, 3.82%) of which was spent in GC.
+took 4,575,586 microseconds (4.575586 seconds) to run.
+       151,609 microseconds (0.151609 seconds, 3.31%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     4,643,492 microseconds (4.643492 seconds) were spent in user mode
-        50,518 microseconds (0.050518 seconds) were spent in system mode
+     5,157,535 microseconds (5.157535 seconds) were spent in user mode
+        63,808 microseconds (0.063808 seconds) were spent in system mode
  1,202,401,600 bytes of memory allocated.
- 129 minor page faults, 0 major page faults, 0 swaps.
+ 132 minor page faults, 0 major page faults, 0 swaps.
 DAMN-FAST-PRIORITY-QUEUE
 (LOOP REPEAT REPEAT DO (RUN))
-took 6,479,452 microseconds (6.479452 seconds) to run.
-           422 microseconds (0.000422 seconds, 0.01%) of which was spent in GC.
+took 6,535,548 microseconds (6.535548 seconds) to run.
 During that period, and with 16 available CPU cores,
-     6,477,646 microseconds (6.477646 seconds) were spent in user mode
+     6,532,783 microseconds (6.532783 seconds) were spent in user mode
              0 microseconds (0.000000 seconds) were spent in system mode
  1,089,600 bytes of memory allocated.
 #+end_example
@@ -321,35 +320,34 @@ Heap of size 1000, with 5000000 reinserts (×50), on Clozure Common Lisp Version
 
 SIMPLE-PAIRING-HEAP (recursive)
 (LOOP REPEAT REPEAT DO (RUN))
-took 40,212,238 microseconds (40.212240 seconds) to run.
-        553,096 microseconds ( 0.553096 seconds, 1.38%) of which was spent in GC.
+took 43,001,339 microseconds (43.001340 seconds) to run.
+        779,135 microseconds ( 0.779135 seconds, 1.81%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     40,752,379 microseconds (40.752380 seconds) were spent in user mode
-        447,789 microseconds ( 0.447789 seconds) were spent in system mode
- 20,303,980,800 bytes of memory allocated.
+     43,632,579 microseconds (43.632580 seconds) were spent in user mode
+        735,491 microseconds ( 0.735491 seconds) were spent in system mode
+ 28,405,573,600 bytes of memory allocated.
 SIMPLE-PAIRING-HEAP (consing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 50,635,831 microseconds (50.635834 seconds) to run.
-        693,797 microseconds ( 0.693797 seconds, 1.37%) of which was spent in GC.
+took 48,242,192 microseconds (48.242190 seconds) to run.
+        880,504 microseconds ( 0.880504 seconds, 1.83%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     50,717,437 microseconds (50.717438 seconds) were spent in user mode
-        863,483 microseconds ( 0.863483 seconds) were spent in system mode
- 24,352,268,000 bytes of memory allocated.
+     48,911,321 microseconds (48.911320 seconds) were spent in user mode
+        866,602 microseconds ( 0.866602 seconds) were spent in system mode
+ 32,453,860,800 bytes of memory allocated.
 BODGE-HEAP (pairing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 54,233,759 microseconds (54.233760 seconds) to run.
-      1,565,222 microseconds ( 1.565222 seconds, 2.89%) of which was spent in GC.
+took 52,846,472 microseconds (52.846474 seconds) to run.
+      1,543,621 microseconds ( 1.543621 seconds, 2.92%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     55,613,465 microseconds (55.613464 seconds) were spent in user mode
-      1,321,364 microseconds ( 1.321364 seconds) were spent in system mode
+     57,767,643 microseconds (57.767643 seconds) were spent in user mode
+        618,778 microseconds ( 0.618778 seconds) were spent in system mode
  12,002,401,600 bytes of memory allocated.
 DAMN-FAST-PRIORITY-QUEUE
 (LOOP REPEAT REPEAT DO (RUN))
-took 83,651,300 microseconds (83.651300 seconds) to run.
-            456 microseconds ( 0.000456 seconds, 0.00%) of which was spent in GC.
+took 83,277,462 microseconds (83.277466 seconds) to run.
 During that period, and with 16 available CPU cores,
-     79,619,724 microseconds (79.619730 seconds) were spent in user mode
-      1,906,599 microseconds ( 1.906599 seconds) were spent in system mode
+     83,252,182 microseconds (83.252180 seconds) were spent in user mode
+              0 microseconds ( 0.000000 seconds) were spent in system mode
  1,089,600 bytes of memory allocated.
 #+end_example
 
@@ -361,38 +359,38 @@ Heap of size 50000, with 1000000 reinserts (×50), on Clozure Common Lisp Versio
 
 SIMPLE-PAIRING-HEAP (recursive)
 (LOOP REPEAT REPEAT DO (RUN))
-took 20,108,633 microseconds (20.108631 seconds) to run.
-      4,095,141 microseconds ( 4.095141 seconds, 20.37%) of which was spent in GC.
+took 20,237,112 microseconds (20.237112 seconds) to run.
+      5,168,918 microseconds ( 5.168918 seconds, 25.54%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     20,261,623 microseconds (20.261623 seconds) were spent in user mode
-        362,589 microseconds ( 0.362589 seconds) were spent in system mode
- 12,692,726,400 bytes of memory allocated.
- 800 minor page faults, 0 major page faults, 0 swaps.
+     20,734,308 microseconds (20.734308 seconds) were spent in user mode
+        443,423 microseconds ( 0.443423 seconds) were spent in system mode
+ 17,203,634,400 bytes of memory allocated.
+ 928 minor page faults, 0 major page faults, 0 swaps.
 SIMPLE-PAIRING-HEAP (consing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 24,467,893 microseconds (24.467892 seconds) to run.
-      4,425,967 microseconds ( 4.425967 seconds, 18.09%) of which was spent in GC.
+took 22,642,207 microseconds (22.642208 seconds) to run.
+      5,395,607 microseconds ( 5.395607 seconds, 23.83%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     23,583,468 microseconds (23.583467 seconds) were spent in user mode
-      1,174,325 microseconds ( 1.174325 seconds) were spent in system mode
- 14,877,633,600 bytes of memory allocated.
- 896 minor page faults, 0 major page faults, 0 swaps.
+     23,225,773 microseconds (23.225773 seconds) were spent in user mode
+        472,751 microseconds ( 0.472751 seconds) were spent in system mode
+ 19,388,541,600 bytes of memory allocated.
+ 1,408 minor page faults, 0 major page faults, 0 swaps.
 BODGE-HEAP (pairing)
 (LOOP REPEAT REPEAT DO (RUN))
-took 34,427,471 microseconds (34.427470 seconds) to run.
-      2,520,191 microseconds ( 2.520191 seconds, 7.32%) of which was spent in GC.
+took 33,906,022 microseconds (33.906025 seconds) to run.
+      2,363,777 microseconds ( 2.363777 seconds, 6.97%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     33,733,223 microseconds (33.733223 seconds) were spent in user mode
-        906,055 microseconds ( 0.906055 seconds) were spent in system mode
+     35,758,558 microseconds (35.758560 seconds) were spent in user mode
+        105,533 microseconds ( 0.105533 seconds) were spent in system mode
  2,520,001,600 bytes of memory allocated.
- 128 minor page faults, 0 major page faults, 0 swaps.
+ 160 minor page faults, 0 major page faults, 0 swaps.
 DAMN-FAST-PRIORITY-QUEUE
 (LOOP REPEAT REPEAT DO (RUN))
-took 22,279,603 microseconds (22.279604 seconds) to run.
-         30,005 microseconds ( 0.030005 seconds, 0.13%) of which was spent in GC.
+took 22,328,207 microseconds (22.328209 seconds) to run.
+         16,996 microseconds ( 0.016996 seconds, 0.08%) of which was spent in GC.
 During that period, and with 16 available CPU cores,
-     21,126,583 microseconds (21.126583 seconds) were spent in user mode
-        631,544 microseconds ( 0.631544 seconds) were spent in system mode
+     22,028,990 microseconds (22.028990 seconds) were spent in user mode
+         63,968 microseconds ( 0.063968 seconds) were spent in system mode
  78,532,800 bytes of memory allocated.
 #+end_example
 
@@ -402,41 +400,41 @@ During that period, and with 16 available CPU cores,
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.2.0.36.HEAD.3-618dfba1f
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  0.986 seconds of real time
-  1.060131 seconds of total run time (1.059570 user, 0.000561 system)
-  [ Run times consist of 0.058 seconds GC time, and 1.003 seconds non-GC time. ]
-  107.51% CPU
-  3,743,594,510 processor cycles
-  2,222,750,224 bytes consed
+  0.763 seconds of real time
+  0.804266 seconds of total run time (0.804039 user, 0.000227 system)
+  [ Run times consist of 0.058 seconds GC time, and 0.747 seconds non-GC time. ]
+  105.37% CPU
+  2,899,290,332 processor cycles
+  2,224,160,512 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  0.986 seconds of real time
-  1.084297 seconds of total run time (1.079800 user, 0.004497 system)
-  [ Run times consist of 0.070 seconds GC time, and 1.015 seconds non-GC time. ]
-  109.94% CPU
-  3,752,458,010 processor cycles
-  2,658,005,616 bytes consed
+  0.806 seconds of real time
+  0.882806 seconds of total run time (0.874831 user, 0.007975 system)
+  [ Run times consist of 0.068 seconds GC time, and 0.815 seconds non-GC time. ]
+  109.55% CPU
+  3,071,182,572 processor cycles
+  2,659,592,928 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  0.833 seconds of real time
-  0.867504 seconds of total run time (0.864073 user, 0.003431 system)
-  [ Run times consist of 0.033 seconds GC time, and 0.835 seconds non-GC time. ]
-  104.20% CPU
-  3,158,633,492 processor cycles
-  1,202,406,416 bytes consed
+  0.830 seconds of real time
+  0.867637 seconds of total run time (0.853447 user, 0.014190 system)
+  [ Run times consist of 0.032 seconds GC time, and 0.836 seconds non-GC time. ]
+  104.58% CPU
+  3,145,536,640 processor cycles
+  1,202,409,536 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  1.323 seconds of real time
-  1.323063 seconds of total run time (1.323063 user, 0.000000 system)
+  1.330 seconds of real time
+  1.330138 seconds of total run time (1.330138 user, 0.000000 system)
   100.00% CPU
-  5,019,708,002 processor cycles
+  5,046,587,568 processor cycles
   1,082,448 bytes consed
 #+end_example
 
@@ -444,41 +442,41 @@ Evaluation took:
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.2.0.36.HEAD.3-618dfba1f
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  8.666 seconds of real time
-  9.041410 seconds of total run time (8.982402 user, 0.059008 system)
-  [ Run times consist of 0.524 seconds GC time, and 8.518 seconds non-GC time. ]
-  104.33% CPU
-  32,868,764,734 processor cycles
-  20,307,277,488 bytes consed
+  6.833 seconds of real time
+  7.404602 seconds of total run time (7.339435 user, 0.065167 system)
+  [ Run times consist of 0.502 seconds GC time, and 6.903 seconds non-GC time. ]
+  108.37% CPU
+  25,911,838,658 processor cycles
+  20,303,175,568 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  8.573 seconds of real time
-  8.966212 seconds of total run time (8.871472 user, 0.094740 system)
-  [ Run times consist of 0.588 seconds GC time, and 8.379 seconds non-GC time. ]
-  104.58% CPU
-  32,522,518,994 processor cycles
-  24,356,103,680 bytes consed
+  7.083 seconds of real time
+  7.561588 seconds of total run time (7.486017 user, 0.075571 system)
+  [ Run times consist of 0.577 seconds GC time, and 6.985 seconds non-GC time. ]
+  106.76% CPU
+  26,857,147,976 processor cycles
+  24,351,327,120 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  7.470 seconds of real time
-  7.657456 seconds of total run time (7.641543 user, 0.015913 system)
-  [ Run times consist of 0.307 seconds GC time, and 7.351 seconds non-GC time. ]
-  102.50% CPU
-  28,331,997,820 processor cycles
-  12,002,394,416 bytes consed
+  7.416 seconds of real time
+  7.634455 seconds of total run time (7.602604 user, 0.031851 system)
+  [ Run times consist of 0.307 seconds GC time, and 7.328 seconds non-GC time. ]
+  102.94% CPU
+  28,138,915,868 processor cycles
+  12,002,397,632 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  13.330 seconds of real time
-  13.325077 seconds of total run time (13.325077 user, 0.000000 system)
+  13.123 seconds of real time
+  13.118160 seconds of total run time (13.118160 user, 0.000000 system)
   99.96% CPU
-  50,555,588,170 processor cycles
+  49,775,528,578 processor cycles
   1,082,448 bytes consed
 #+end_example
 
@@ -486,41 +484,41 @@ Evaluation took:
 
 #+RESULTS:
 #+begin_example
-Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.1.11.65.HEAD.3-69c5739bb
+Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.2.0.36.HEAD.3-618dfba1f
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  9.106 seconds of real time
-  9.407390 seconds of total run time (8.911670 user, 0.495720 system)
-  [ Run times consist of 1.583 seconds GC time, and 7.825 seconds non-GC time. ]
-  103.31% CPU
-  34,541,937,452 processor cycles
-  12,669,768,976 bytes consed
+  6.420 seconds of real time
+  6.659219 seconds of total run time (6.274127 user, 0.385092 system)
+  [ Run times consist of 1.500 seconds GC time, and 5.160 seconds non-GC time. ]
+  103.72% CPU
+  24,342,747,712 processor cycles
+  12,692,648,560 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  9.770 seconds of real time
-  10.168335 seconds of total run time (9.680254 user, 0.488081 system)
-  [ Run times consist of 1.731 seconds GC time, and 8.438 seconds non-GC time. ]
-  104.07% CPU
-  37,049,344,310 processor cycles
-  14,851,041,168 bytes consed
+  7.340 seconds of real time
+  7.808845 seconds of total run time (7.304444 user, 0.504401 system)
+  [ Run times consist of 1.736 seconds GC time, and 6.073 seconds non-GC time. ]
+  106.39% CPU
+  27,840,487,048 processor cycles
+  14,877,609,952 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  5.783 seconds of real time
-  5.834045 seconds of total run time (5.730539 user, 0.103506 system)
-  [ Run times consist of 0.465 seconds GC time, and 5.370 seconds non-GC time. ]
-  100.88% CPU
-  21,935,215,114 processor cycles
-  2,519,996,640 bytes consed
+  5.776 seconds of real time
+  5.908511 seconds of total run time (5.785796 user, 0.122715 system)
+  [ Run times consist of 0.491 seconds GC time, and 5.418 seconds non-GC time. ]
+  102.30% CPU
+  21,917,719,800 processor cycles
+  2,519,997,936 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  4.543 seconds of real time
-  4.542007 seconds of total run time (4.531152 user, 0.010855 system)
-  [ Run times consist of 0.001 seconds GC time, and 4.542 seconds non-GC time. ]
+  4.510 seconds of real time
+  4.508986 seconds of total run time (4.501858 user, 0.007128 system)
+  [ Run times consist of 0.001 seconds GC time, and 4.508 seconds non-GC time. ]
   99.98% CPU
-  17,228,521,130 processor cycles
+  17,100,371,754 processor cycles
   78,473,680 bytes consed
 #+end_example
