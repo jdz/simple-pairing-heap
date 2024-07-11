@@ -13,6 +13,7 @@
 #+ccl
 (declaim (optimize (speed 3) (safety 1)))
 
+#+(and)
 (progn
   (defstruct (pairing-tree
               (:constructor make-pairing-tree (key elem subheaps))

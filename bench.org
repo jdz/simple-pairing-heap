@@ -1,5 +1,7 @@
-#+title: Simple pairing heap benchmarks
-#+options: num:nil toc:2 ^:nil
+#+TITLE: Simple pairing heap benchmarks
+#+OPTIONS: num:nil toc:2 ^:nil
+#+HTML_HEAD_EXTRA: <style>pre.example, pre.src { display: inline-block; min-width: 100%; } table { margin-top: 1ex; }</style>
+#+PROPERTY: header-args :eval never-export
 
 * [1/1] Tasks                                                      :noexport:
 ** DONE Benchmark against damn fast priority queue
@@ -92,6 +94,94 @@ benchmark blocks (using ~C-c C-c~).
                              :key #'car))))
     (string-right-trim '(#\space #\return #\newline) output))
 #+end_src
+
+* Environment details
+** Features
+
+#+caption: Features
+#+name: cl-features
+#+begin_src lisp :exports results :results output
+  (let ((*print-length* nil))
+    (dolist (sym (sort (copy-list *features*) #'string<))
+      (prin1 sym)
+      (terpri)))
+#+end_src
+
+#+RESULTS: cl-features
+#+begin_example
+:64-BIT
+:ANSI-CL
+:ARENA-ALLOCATOR
+:ASDF
+:ASDF-UNICODE
+:ASDF2
+:ASDF3
+:ASDF3.1
+:ASDF3.2
+:ASDF3.3
+:COMMON-LISP
+:ELF
+:GENCGC
+:HUNCHENTOOT-NO-SSL
+:IEEE-FLOATING-POINT
+:LINUX
+:LITTLE-ENDIAN
+:MCCLIM-FFI-FREETYPE
+:NON-BASE-CHARS-EXIST-P
+:OS-UNIX
+:PACKAGE-LOCAL-NICKNAMES
+:QUICKLISP
+:SB-CORE-COMPRESSION
+:SB-LDB
+:SB-PACKAGE-LOCKS
+:SB-THREAD
+:SB-UNICODE
+:SBCL
+ALEXANDRIA::SEQUENCE-EMPTYP
+:SWANK
+:UNIX
+:X86-64
+#+end_example
+
+** Compiler policy
+
+#+caption: Compiler policy
+#+name: sbcl-compiler-policy
+#+begin_src lisp :results output
+  (sb-ext:describe-compiler-policy)
+#+end_src
+
+#+RESULTS: sbcl-compiler-policy
+#+begin_example
+  Basic qualities:
+COMPILATION-SPEED = 1
+DEBUG = 2
+SAFETY = 1
+SPACE = 1
+SPEED = 1
+INHIBIT-WARNINGS = 1
+  Dependent qualities:
+SB-C::CHECK-CONSTANT-MODIFICATION = 1 -> 1 (maybe)
+SB-C::TYPE-CHECK = 1 -> 3 (full)
+SB-C::LET-CONVERSION = 1 -> 0 (off)
+SB-C:ALIEN-FUNCALL-SAVES-FP-AND-PC = 1 -> 3 (yes)
+SB-C:VERIFY-ARG-COUNT = 1 -> 3 (yes)
+SB-C::INSERT-DEBUG-CATCH = 1 -> 1 (maybe)
+SB-C::RECOGNIZE-SELF-CALLS = 1 -> 0 (no)
+SB-C::FLOAT-ACCURACY = 1 -> 3 (full)
+SB-C:INSERT-STEP-CONDITIONS = 1 -> 2 (no)
+SB-C::COMPUTE-DEBUG-FUN = 1 -> 2 (yes)
+SB-C:STORE-SOURCE-FORM = 1 -> 2 (yes)
+SB-C::PRESERVE-SINGLE-USE-DEBUG-VARIABLES = 1 -> 3 (yes)
+SB-C::PRESERVE-CONSTANTS = 1 -> 0 (no)
+SB-C:INSERT-ARRAY-BOUNDS-CHECKS = 1 -> 3 (yes)
+SB-C::AREF-TRAPPING = 1 -> 0 (no)
+SB-C::STORE-XREF-DATA = 1 -> 3 (yes)
+SB-C:STORE-COVERAGE-DATA = 1 -> 0 (no)
+SB-C:INSTRUMENT-CONSING = 1 -> 1 (no)
+SB-C::STORE-CLOSURE-DEBUG-POINTER = 1 -> 0 (no)
+SB-C:JUMP-TABLE = 1 -> 1 (auto)
+#+end_example
 
 * Benchmarks with pairing heap nodes as cons cells
 ** CCL
@@ -399,124 +489,133 @@ During that period, and with 16 available CPU cores,
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.3.1.93.HEAD.3-da1536544
+Heap of size 1000, with 500000 reinserts (×50), on SBCL 2.4.6.50.HEAD.3-ad944aecc
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  0.703 seconds of real time
-  0.699018 seconds of total run time (0.692383 user, 0.006635 system)
-  [ Run times consist of 0.038 seconds GC time, and 0.662 seconds non-GC time. ]
-  99.43% CPU
-  2,662,436,522 processor cycles
-  2,220,635,024 bytes consed
+  0.713 seconds of real time
+  0.709925 seconds of total run time (0.706154 user, 0.003771 system)
+  [ Real times consist of 0.026 seconds GC time, and 0.687 seconds non-GC time. ]
+  [ Run times consist of 0.033 seconds GC time, and 0.677 seconds non-GC time. ]
+  99.58% CPU
+  2,708,721,548 processor cycles
+  2,225,739,520 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  0.753 seconds of real time
-  0.748290 seconds of total run time (0.738071 user, 0.010219 system)
-  [ Run times consist of 0.048 seconds GC time, and 0.701 seconds non-GC time. ]
-  99.34% CPU
-  2,861,506,248 processor cycles
-  2,655,586,080 bytes consed
+  0.843 seconds of real time
+  0.844756 seconds of total run time (0.828306 user, 0.016450 system)
+  [ Real times consist of 0.036 seconds GC time, and 0.807 seconds non-GC time. ]
+  [ Run times consist of 0.041 seconds GC time, and 0.804 seconds non-GC time. ]
+  100.24% CPU
+  3,200,384,168 processor cycles
+  2,661,554,816 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  0.833 seconds of real time
-  0.826750 seconds of total run time (0.820094 user, 0.006656 system)
-  [ Run times consist of 0.020 seconds GC time, and 0.807 seconds non-GC time. ]
-  99.28% CPU
-  3,154,292,106 processor cycles
-  1,202,427,088 bytes consed
+  1.010 seconds of real time
+  1.010654 seconds of total run time (1.010593 user, 0.000061 system)
+  [ Real times consist of 0.020 seconds GC time, and 0.990 seconds non-GC time. ]
+  [ Run times consist of 0.018 seconds GC time, and 0.993 seconds non-GC time. ]
+  100.10% CPU
+  3,832,797,344 processor cycles
+  1,202,394,352 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  1.386 seconds of real time
-  1.386884 seconds of total run time (1.386884 user, 0.000000 system)
-  100.07% CPU
-  5,262,267,322 processor cycles
-  1,068,064 bytes consed
+  1.273 seconds of real time
+  1.274268 seconds of total run time (1.274227 user, 0.000041 system)
+  100.08% CPU
+  4,836,368,224 processor cycles
+  1,068,016 bytes consed
 #+end_example
 
 #+call: run-benchmark(1000, 5000000)
 
 #+RESULTS:
 #+begin_example
-Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.3.1.93.HEAD.3-da1536544
+Heap of size 1000, with 5000000 reinserts (×50), on SBCL 2.4.6.50.HEAD.3-ad944aecc
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  6.383 seconds of real time
-  6.336102 seconds of total run time (6.212373 user, 0.123729 system)
-  [ Run times consist of 0.370 seconds GC time, and 5.967 seconds non-GC time. ]
-  99.26% CPU
-  24,214,434,404 processor cycles
-  20,299,288,784 bytes consed
+  6.550 seconds of real time
+  6.549307 seconds of total run time (6.479484 user, 0.069823 system)
+  [ Real times consist of 0.333 seconds GC time, and 6.217 seconds non-GC time. ]
+  [ Run times consist of 0.336 seconds GC time, and 6.214 seconds non-GC time. ]
+  99.98% CPU
+  24,847,253,154 processor cycles
+  20,297,253,680 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  6.740 seconds of real time
-  6.670690 seconds of total run time (6.533746 user, 0.136944 system)
-  [ Run times consist of 0.417 seconds GC time, and 6.254 seconds non-GC time. ]
-  98.98% CPU
-  25,560,246,280 processor cycles
-  24,345,202,032 bytes consed
+  7.726 seconds of real time
+  7.696336 seconds of total run time (7.629795 user, 0.066541 system)
+  [ Real times consist of 0.336 seconds GC time, and 7.390 seconds non-GC time. ]
+  [ Run times consist of 0.369 seconds GC time, and 7.328 seconds non-GC time. ]
+  99.61% CPU
+  29,303,081,132 processor cycles
+  24,345,778,160 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  7.720 seconds of real time
-  7.664456 seconds of total run time (7.624069 user, 0.040387 system)
-  [ Run times consist of 0.227 seconds GC time, and 7.438 seconds non-GC time. ]
-  99.27% CPU
-  29,282,698,236 processor cycles
+  9.566 seconds of real time
+  9.554493 seconds of total run time (9.521023 user, 0.033470 system)
+  [ Real times consist of 0.236 seconds GC time, and 9.330 seconds non-GC time. ]
+  [ Run times consist of 0.201 seconds GC time, and 9.354 seconds non-GC time. ]
+  99.87% CPU
+  36,285,920,928 processor cycles
   12,002,388,736 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  14.070 seconds of real time
-  13.857882 seconds of total run time (13.631766 user, 0.226116 system)
-  98.49% CPU
-  53,365,608,028 processor cycles
-  1,068,064 bytes consed
+  12.906 seconds of real time
+  12.901468 seconds of total run time (12.901440 user, 0.000028 system)
+  99.96% CPU
+  48,956,394,574 processor cycles
+  1,068,016 bytes consed
 #+end_example
 
 #+call: run-benchmark(50000, 1000000)
 
 #+RESULTS:
 #+begin_example
-Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.3.1.93.HEAD.3-da1536544
+Heap of size 50000, with 1000000 reinserts (×50), on SBCL 2.4.6.50.HEAD.3-ad944aecc
 
 SIMPLE-PAIRING-HEAP (recursive)
 Evaluation took:
-  6.866 seconds of real time
-  6.831151 seconds of total run time (6.371278 user, 0.459873 system)
-  [ Run times consist of 1.444 seconds GC time, and 5.388 seconds non-GC time. ]
-  99.49% CPU
-  26,051,243,254 processor cycles
-  12,671,549,552 bytes consed
+  6.443 seconds of real time
+  6.443982 seconds of total run time (6.027710 user, 0.416272 system)
+  [ Real times consist of 1.320 seconds GC time, and 5.123 seconds non-GC time. ]
+  [ Run times consist of 1.308 seconds GC time, and 5.136 seconds non-GC time. ]
+  100.02% CPU
+  24,445,845,132 processor cycles
+  12,668,388,912 bytes consed
 
 SIMPLE-PAIRING-HEAP (consing)
 Evaluation took:
-  7.720 seconds of real time
-  7.675130 seconds of total run time (7.180954 user, 0.494176 system)
-  [ Run times consist of 1.665 seconds GC time, and 6.011 seconds non-GC time. ]
-  99.42% CPU
-  29,288,240,650 processor cycles
-  14,853,028,960 bytes consed
+  7.600 seconds of real time
+  7.607486 seconds of total run time (7.174304 user, 0.433182 system)
+  [ Real times consist of 1.610 seconds GC time, and 5.990 seconds non-GC time. ]
+  [ Run times consist of 1.590 seconds GC time, and 6.018 seconds non-GC time. ]
+  100.09% CPU
+  28,833,924,772 processor cycles
+  14,849,417,968 bytes consed
 
 BODGE-HEAP (pairing)
 Evaluation took:
-  5.823 seconds of real time
-  5.813719 seconds of total run time (5.680702 user, 0.133017 system)
-  [ Run times consist of 0.411 seconds GC time, and 5.403 seconds non-GC time. ]
-  99.85% CPU
-  22,083,372,592 processor cycles
+  6.273 seconds of real time
+  6.268726 seconds of total run time (6.148752 user, 0.119974 system)
+  [ Real times consist of 0.416 seconds GC time, and 5.857 seconds non-GC time. ]
+  [ Run times consist of 0.403 seconds GC time, and 5.866 seconds non-GC time. ]
+  99.94% CPU
+  23,802,017,592 processor cycles
   2,520,017,776 bytes consed
 
 DAMN-FAST-PRIORITY-QUEUE
 Evaluation took:
-  4.683 seconds of real time
-  4.680522 seconds of total run time (4.677370 user, 0.003152 system)
-  99.96% CPU
-  17,758,980,914 processor cycles
-  78,440,896 bytes consed
+  4.273 seconds of real time
+  4.273516 seconds of total run time (4.260166 user, 0.013350 system)
+  100.02% CPU
+  16,216,080,366 processor cycles
+  78,440,848 bytes consed
 #+end_example
